@@ -19,15 +19,31 @@ namespace spookify
     /// </summary>
     public partial class UpdateWindow : Window
     {
+        private int id { get; set; }
+
+        ApiService apiService = new ApiService("http://localhost:5006/", "C:\\Users\\vdeniss\\Documents\\GitHub\\frontend\\temp");
+
         //public UpdateWindow(Song song)
-        public UpdateWindow()
+        public UpdateWindow(int id)
         {
+            this.id = id;
             InitializeComponent();
         }
 
-        private void ClickUpdateSong(object sender, RoutedEventArgs e)
+        private async void ClickUpdateSong(object sender, RoutedEventArgs e)
         {
             // update song in allSongs
+
+            await apiService.UpdateSongAsync(new Song
+            {
+                songID = this.id,
+                name = nameInput.Text,
+                artist = artistInput.Text,
+                album = albumInput.Text,
+                filename = filenameInput.Text,
+            });
+
+            this.Close();
         }
     }
 }

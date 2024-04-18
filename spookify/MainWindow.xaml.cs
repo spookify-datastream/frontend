@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WMPLib;
 
 namespace spookify
 {
@@ -19,36 +20,49 @@ namespace spookify
     public partial class MainWindow : Window
     {
 
+        private WindowsMediaPlayer player = new WindowsMediaPlayer();
+
+
         private ObservableCollection<Song> songs = new ObservableCollection<Song>();
         private ObservableCollection<Song> allSongs = new ObservableCollection<Song>();
 
+
+        ApiService apiService = new ApiService("http://localhost:5006/", "C:\\Users\\vdeniss\\Documents\\GitHub\\frontend\\temp");
+
         public MainWindow()
         {
-            
-            //ConfigurationHelper.InitializeConfiguration();
-            //string apiBaseUrl = ConfigurationHelper.GetApiBaseUrl();
-            //string destinationFolder = ConfigurationHelper.GetDestinationFolderPath();
 
-            
+            ConfigurationHelper.InitializeConfiguration();
+            string apiBaseUrl = ConfigurationHelper.GetApiBaseUrl();
+            string destinationFolder = ConfigurationHelper.GetDestinationFolderPath();
+
+
 
             InitializeComponent();
+
             
-            ApiService apiService = new ApiService(
-                "http://localhost:5006/",
-                "C:\\Users\\vdeniss\\Documents\\GitHub\\frontend\\temp");
-
-
             // get song with id 1
 
-            Song song = apiService.GetSongAsync(1).Result;
-            
-            MessageBox.Show(song.Title+", "+song.Artist);
+            Loaded += async (s, e) =>
+            {
+                allSongs = new ObservableCollection<Song>(await apiService.GetAllSongsAsync());
+                foreach (Song song in allSongs)
+                {
+                    songs.Add(
+                        new Song
+                        {
+                            songID = song.songID,
+                            name = song.name,
+                            artist = song.artist,
+                            album = song.album,
+                            filename = song.filename,
+                            streams = song.streams
+                        }
+                    );
 
-            
-            
-            songs = new ObservableCollection<Song>(allSongs);
-            
-            DataContext = songs;
+                }
+                DataContext = songs;
+            };
 
         }
 
@@ -75,27 +89,71 @@ namespace spookify
 
         private void ClickUpdate(object sender, RoutedEventArgs e)
         {
-            // open UpdateWindow for selected song
             
-            UpdateWindow updateWindow = new UpdateWindow();
-            //UpdateWindow updateWindow = new UpdateWindow((Song)DataGrid.SelectedItem);
-
+            UpdateWindow updateWindow = new UpdateWindow(int.Parse(currentId.Text));
+            
             updateWindow.Show();
+            
+            updateWindow.Closed += (s, e) =>
+            {
+                RefreshSongs();
+            };
 
         }
 
         private void ClickCreate(object sender, RoutedEventArgs e)
         {
-            // open CreateWindow
-
+            
             CreateWindow createWindow = new CreateWindow();
+            
             createWindow.Show();
+            
+            createWindow.Closed += (s, e) =>
+            {
+                RefreshSongs();
+            };
 
         }
 
-        private void ClickDelete(object sender, RoutedEventArgs e)
+        private async void ClickDelete(object sender, RoutedEventArgs e)
         {
             // delete selected song
+            await apiService.DeleteSongAsync(int.Parse(currentId.Text));
+            RefreshSongs();
+        }
+
+        private async void ClickPlay(object sender, RoutedEventArgs e)
+        {
+
+            await apiService.DownloadSongFileAsync(new Song
+            {
+                songID = int.Parse(currentId.Text),
+                name = currentTitle.Text,
+                artist = currentArtist.Text,
+                album = currentAlbum.Text,
+                filename = currentFilename.Text,
+                streams = int.Parse(currentStreams.Text)
+            });
+
+            Song song = (Song)songsDataGrid.SelectedItem;
+
+            player.URL = "C:\\Users\\vdeniss\\Documents\\GitHub\\frontend\\temp\\" + song.filename;
+
+            player.controls.play();
+            
+
+        }
+
+        private void ClickPause(object sender, RoutedEventArgs e)
+        {
+            player.controls.stop();
+        }
+
+        private async void RefreshSongs()
+        {
+            songs.Clear();
+            songs = new ObservableCollection<Song>(await apiService.GetAllSongsAsync());
+            DataContext = songs;
         }
 
         private void DataGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -125,12 +183,12 @@ namespace spookify
 
         private void setCurrentSong(Song song)
         {
-            currentTitle.Text = song.Title;
-            currentArtist.Text = song.Artist;
-            currentAlbum.Text = song.Album;
-            currentId.Text = song.Id.ToString();
-            currentFilename.Text = song.Filename;
-            currentStreams.Text = song.Streams.ToString();
+            currentTitle.Text = song.name;
+            currentArtist.Text = song.artist;
+            currentAlbum.Text = song.album;
+            currentId.Text = song.songID.ToString();
+            currentFilename.Text = song.filename;
+            currentStreams.Text = song.streams.ToString();
         }
     }
 }

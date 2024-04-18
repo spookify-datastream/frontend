@@ -126,7 +126,7 @@
                         </Style>
                     </DataGrid.RowStyle>
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="Auto">
+                        <DataGridTextColumn Header="Id" Binding="{Binding songID}" Width="Auto">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -134,7 +134,7 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*">
+                        <DataGridTextColumn Header="Title" Binding="{Binding name}" Width="*">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -142,7 +142,7 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Album" Binding="{Binding Album}" Width="*">
+                        <DataGridTextColumn Header="Album" Binding="{Binding album}" Width="*">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -150,7 +150,7 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Artist" Binding="{Binding Artist}" Width="*">
+                        <DataGridTextColumn Header="Artist" Binding="{Binding artist}" Width="*">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -158,7 +158,7 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Streams" Binding="{Binding Streams}" Width="Auto">
+                        <DataGridTextColumn Header="Streams" Binding="{Binding streams}" Width="Auto">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -166,7 +166,7 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Filename" Binding="{Binding Filename}" Width="*">
+                        <DataGridTextColumn Header="Filename" Binding="{Binding filename}" Width="*">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -185,30 +185,13 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Border Grid.Column="0" Margin="36,18,18,18" Background="White" CornerRadius="10">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" VerticalAlignment="Bottom" Margin="32,16,32,0">
-                        <ui:TextBlock Text="00:00 / 02:44" FontSize="16" FontFamily="Cairo" FontWeight="Bold" HorizontalAlignment="Center" Foreground="Black"/>
-                    </Grid>
-                    <Grid Grid.Row="1" VerticalAlignment="Top" Margin="32,0,32,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="0" Margin="32,0,0,0" HorizontalAlignment="Right">
-                            <ui:SymbolIcon Symbol="Previous16" Foreground="Black" FontSize="24"/>
-                        </Grid>
-                        <Grid Grid.Column="1" Margin="2,0,4,0" HorizontalAlignment="Center" MouseDown="Grid_MouseDown">
-                            <ui:SymbolIcon Symbol="Play16" Foreground="Black" FontSize="24"/>
-                        </Grid>
-                        <Grid Grid.Column="2" Margin="0,0,32,0" HorizontalAlignment="Left">
-                            <ui:SymbolIcon Symbol="Next16" Foreground="Black" FontSize="24"/>
-                        </Grid>
-                    </Grid>
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Grid.Column="0" Symbol="Play32" Foreground="#005FB8" Width="48" Height="48" FontSize="24" Margin="32,0,16,0" MouseLeftButtonUp="ClickPlay"/>
+                    <ui:SymbolIcon Grid.Column="1" Symbol="Pause32" Foreground="#005FB8" Width="48" Height="48" FontSize="24" Margin="16,0,32,0" MouseLeftButtonUp="ClickPause"/>
                 </Grid>
             </Border>
             <Border Grid.Column="1" Margin="18,18,36,18" Background="White" CornerRadius="10">

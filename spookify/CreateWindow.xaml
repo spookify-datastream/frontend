@@ -34,13 +34,13 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <ui:TextBlock Grid.Row="0" Grid.Column="0" Text="Title" FontWeight="Bold" VerticalAlignment="Center"/>
-            <ui:TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Title, Mode=TwoWay}" Margin="16,0,0,8"/>
+            <ui:TextBox x:Name="titleInput" Grid.Row="0" Grid.Column="1" Text="{Binding name}" Margin="16,0,0,8"/>
             <ui:TextBlock Grid.Row="1" Grid.Column="0" Text="Artist" FontWeight="Bold" VerticalAlignment="Center"/>
-            <ui:TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Artist, Mode=TwoWay}" Margin="16,0,0,8"/>
+            <ui:TextBox x:Name="artistInput" Grid.Row="1" Grid.Column="1" Text="{Binding artist}" Margin="16,0,0,8"/>
             <ui:TextBlock Grid.Row="2" Grid.Column="0" Text="Album" FontWeight="Bold" VerticalAlignment="Center"/>
-            <ui:TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Album, Mode=TwoWay}" Margin="16,0,0,8"/>
+            <ui:TextBox x:Name="albumInput" Grid.Row="2" Grid.Column="1" Text="{Binding album}" Margin="16,0,0,8"/>
             <ui:TextBlock Grid.Row="3" Grid.Column="0" Text="File name" FontWeight="Bold" VerticalAlignment="Center"/>
-            <ui:TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Filename, Mode=TwoWay}" Margin="16,0,0,8"/>
+            <ui:TextBox x:Name="filenameInput" Grid.Row="3" Grid.Column="1" Text="{Binding filename}" Margin="16,0,0,8"/>
         </Grid>
         <ui:Button Grid.Row="2" Content="Create" Background="#005FB8" Foreground="White" FontSize="16" FontFamily="Cairo" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center" Width="72" Click="ClickCreateSong" Margin="0">
             <ui:Button.MouseOverBackground>

@@ -19,7 +19,13 @@ public class ApiService {
     }
 
     public async Task<bool> AddSongAsync(Song song) {
-        var response = await _client.PostAsJsonAsync("Songs", song);
+        var response = await _client.PostAsJsonAsync("Songs", new
+        {
+            name = song.name,
+            album = song.album,
+            artist = song.artist,
+            filename = song.filename
+        });
         return response.IsSuccessStatusCode;
     }
 
@@ -44,18 +50,27 @@ public class ApiService {
     public async Task<bool> DownloadSongFileAsync(Song song) {
         try {
             // Make the HTTP request to get the song file as a stream
-            var response = await _client.GetAsync($"Songs/{song.Id}/file", HttpCompletionOption.ResponseHeadersRead);
+            var response = await _client.GetAsync($"Songs/{song.songID}/file", HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
 
             Directory.CreateDirectory(_destinationFolderPath);
 
             // Construct the local file path
-            var localFilePath = Path.Combine(_destinationFolderPath, song.Filename);  // Assumes file is in mp3 format
+            var localFilePath = Path.Combine(_destinationFolderPath, song.filename);  // Assumes file is in mp3 format
 
-            // Open a stream for the file to be written to
-            using (var fileStream = new FileStream(localFilePath, FileMode.Create, FileAccess.Write, FileShare.None)) {
-                // Copy the content from the response stream to the local file stream
-                await response.Content.CopyToAsync(fileStream);
+            // Open a stream for the file to be written to 
+            // unless file already exists
+            if (File.Exists(localFilePath))
+            {
+                Console.WriteLine("File already exists");
+                return true;
+            }
+            else
+            { 
+                using (var fileStream = new FileStream(localFilePath, FileMode.Create, FileAccess.Write, FileShare.None)) 
+                {
+                    await response.Content.CopyToAsync(fileStream);
+                } 
             }
 
             return true;
@@ -69,11 +84,11 @@ public class ApiService {
 }
 
 public class Song {
-    public int Id { get; set; }
-    public string Title { get; set; }
-    public string Album { get; set; }
-    public string Artist { get; set; }
-    public int Streams { get; set; }
-    public string Filename { get; set; }
+    public int songID { get; set; }
+    public string name { get; set; }
+    public string album { get; set; }
+    public string artist { get; set; }
+    public int streams { get; set; }
+    public string filename { get; set; }
 
 }
