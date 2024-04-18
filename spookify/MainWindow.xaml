@@ -35,13 +35,15 @@
             </Grid>
 
             <Grid Grid.Column="1" Margin="18">
-                <TextBlock Text="Database Management" FontSize="28" FontFamily="Cairo" Foreground="Black" FontWeight="Black" VerticalAlignment="Center"/>
+                <TextBlock Text="Song Management" FontSize="28" FontFamily="Cairo" Foreground="Black" FontWeight="Black" VerticalAlignment="Center"/>
             </Grid>
 
             <Grid Grid.Column="2" Margin="18">
-                <ui:AutoSuggestBox PlaceholderText="Search" VerticalAlignment="Center" TextChanged="AutoSuggestBox_TextChanged">
-                    <ui:SymbolIconSource Symbol="Search16" />
-                </ui:AutoSuggestBox>
+                <!--
+                    <ui:AutoSuggestBox x:Name="Search" VerticalAlignment="Center" KeyUp="filterTextGiven">
+                        <ui:SymbolIconSource Symbol="Search16" />
+                    </ui:AutoSuggestBox>
+                -->
             </Grid>
 
             <Grid Grid.Column="3" Margin="18,18,36,18">
@@ -74,8 +76,8 @@
                     GridLinesVisibility="None"
                     x:Name="songsDataGrid"
                     ItemsSource="{Binding}"
-                    SelectionMode="Single"
-                    SelectionUnit="FullRow"
+                    SelectionMode="Extended" SelectionUnit="FullRow" 
+                    PreviewMouseLeftButtonDown="DataGrid_PreviewMouseLeftButtonDown"
                     VerticalScrollBarVisibility="Auto"
                     HorizontalScrollBarVisibility="Auto"
                     Margin="8"
@@ -96,6 +98,7 @@
                     </DataGrid.ColumnHeaderStyle>
                     <DataGrid.CellStyle>
                         <Style TargetType="DataGridCell">
+                            <Setter Property="IsHitTestVisible" Value="False"/>
                             <Setter Property="Background" Value="White"/>
                             <Setter Property="Foreground" Value="Black"/>
                             <Setter Property="FontSize" Value="16"/>
@@ -104,97 +107,72 @@
                             <Setter Property="VerticalContentAlignment" Value="Center"/>
                             <Setter Property="BorderThickness" Value="0"/>
                             <Setter Property="Padding" Value="10,5"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="#F0F0F0"/>
+                                    <Setter Property="Foreground" Value="Black"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                </Trigger>
+                            </Style.Triggers>
                         </Style>
                     </DataGrid.CellStyle>
                     <DataGrid.RowStyle>
                         <!-- every second row bg #f3f3f3 -->
                         <Style TargetType="DataGridRow">
+                            <EventSetter Event="MouseLeftButtonDown" Handler="rowSelect"/>
                             <Setter Property="Background" Value="White"/>
                             <Setter Property="Height" Value="38"/>
                             <Setter Property="FontSize" Value="16"/>
-                            <Style.Triggers>
-
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Background" Value="#005FB8"/>
-                                    <Setter Property="Foreground" Value="White"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                </Trigger>
-                                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                                    <Setter Property="Background" Value="#F3F3F3"/>
-                                </Trigger>
-
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsSelected" Value="True"/>
-                                        <Condition Property="ItemsControl.AlternationIndex" Value="1"/>
-                                    </MultiTrigger.Conditions>
-                                    <Setter Property="Background" Value="#005FB8"/>
-                                    <Setter Property="Foreground" Value="White"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                </MultiTrigger>
-                            </Style.Triggers>
                         </Style>
                     </DataGrid.RowStyle>
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="#" Binding="{Binding Number}" Width="Auto">
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
+                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="Auto">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Padding" Value="10,5"/>
                                 </Style>
-                            </DataGridTextColumn.CellStyle>
-                        </DataGridTextColumn>
-                        <DataGridTextColumn Header="ID" Binding="{Binding ID}" Width="Auto">
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                </Style>
-                            </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*">
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Left"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Padding" Value="10,5"/>
                                 </Style>
-                            </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Album" Binding="{Binding Album}" Width="Auto">
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
-                                    <Setter Property="Padding" Value="10,5,10,5"/>
+                        <DataGridTextColumn Header="Album" Binding="{Binding Album}" Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Left"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Padding" Value="10,5"/>
                                 </Style>
-                            </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        
-                        <DataGridTextColumn Header="Artist" Binding="{Binding Artist}" Width="Auto">
-                            <!-- leave room for a bit more than just the required width -->
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
-                                    <Setter Property="Padding" Value="10,5,10,5"/>
+                        <DataGridTextColumn Header="Artist" Binding="{Binding Artist}" Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Left"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Padding" Value="10,5"/>
                                 </Style>
-                            </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Duration" Binding="{Binding Duration}" Width="Auto">
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
+                        <DataGridTextColumn Header="Streams" Binding="{Binding Streams}" Width="Auto">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Padding" Value="10,5"/>
                                 </Style>
-                            </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Path" Binding="{Binding Path}" Width="*">
-                            <DataGridTextColumn.CellStyle>
-                                <Style TargetType="DataGridCell">
+                        <DataGridTextColumn Header="Filename" Binding="{Binding Filename}" Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Left"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Padding" Value="10,5"/>
                                 </Style>
-                            </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                     </DataGrid.Columns>
                 </DataGrid>
@@ -248,13 +226,13 @@
 
                     <!-- First Row -->
                     <Grid Grid.Column="0" Grid.Row="0" Margin="32,16,0,16">
-                        <ui:TextBlock Text="Spooky Scary Skeletons" FontSize="16" FontFamily="Cairo" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black"/>
+                        <ui:TextBlock x:Name="currentTitle"  FontSize="16" FontFamily="Cairo" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black"/>
                     </Grid>
                     <Grid Grid.Column="1" Grid.Row="0" Margin="0,16,0,16">
-                        <ui:TextBlock Text="Spooky Album" FontSize="16" FontFamily="Cairo" FontWeight="Regular" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black"/>
+                        <ui:TextBlock x:Name="currentAlbum" FontSize="16" FontFamily="Cairo" FontWeight="Regular" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black"/>
                     </Grid>
                     <Grid Grid.Column="2" Grid.Row="0" Margin="0,16,0,16">
-                        <ui:TextBlock Text="ID 382812" FontSize="16" FontFamily="Cairo" FontWeight="Regular" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black"/>
+                        <ui:TextBlock x:Name="currentId" FontSize="16" FontFamily="Cairo" FontWeight="Regular" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black"/>
                     </Grid>
                     <Grid Grid.Column="3" Grid.Row="0" Margin="0,16,32,16">
                         <ui:Button Content="Update" Background="#005FB8" Foreground="White" FontSize="16" FontFamily="Cairo" FontWeight="SemiBold" HorizontalAlignment="Right" VerticalAlignment="Center" Width="72" Click="ClickUpdate">
@@ -272,13 +250,13 @@
 
                     <!-- Second Row -->
                     <Grid Grid.Column="0" Grid.Row="1" Margin="32,0,0,16">
-                        <ui:TextBlock Text="Lavon Hicks" FontSize="16" FontFamily="Cairo" FontWeight="Regular" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black"/>
+                        <ui:TextBlock x:Name="currentArtist" FontSize="16" FontFamily="Cairo" FontWeight="Regular" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black"/>
                     </Grid>
                     <Grid Grid.Column="1" Grid.Row="1" Margin="0,0,0,16">
-                        <ui:TextBlock Text="/Path/To/Song..." FontSize="16" FontFamily="Cairo" FontWeight="Regular" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black"/>
+                        <ui:TextBlock x:Name="currentFilename" FontSize="16" FontFamily="Cairo" FontWeight="Regular" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black"/>
                     </Grid>
                     <Grid Grid.Column="2" Grid.Row="1" Margin="0,0,0,16">
-                        <ui:TextBlock Text="13k streams" FontSize="16" FontFamily="Cairo" FontWeight="Regular" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black"/>
+                        <ui:TextBlock x:Name="currentStreams" FontSize="16" FontFamily="Cairo" FontWeight="Regular" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="Black"/>
                     </Grid>
                     <Grid Grid.Column="3" Grid.Row="1" Margin="0,0,32,16">
                         <ui:Button Content="Delete" Background="#005FB8" Foreground="White" FontSize="16" FontFamily="Cairo" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center" Width="72" Click="ClickDelete">
